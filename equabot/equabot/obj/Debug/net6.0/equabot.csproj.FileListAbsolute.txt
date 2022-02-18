@@ -1,0 +1,12 @@
+/Users/jshobrook/Projects/equabot/equabot/equabot/bin/Debug/net6.0/equabot.deps.json
+/Users/jshobrook/Projects/equabot/equabot/equabot/bin/Debug/net6.0/equabot.dll
+/Users/jshobrook/Projects/equabot/equabot/equabot/bin/Debug/net6.0/ref/equabot.dll
+/Users/jshobrook/Projects/equabot/equabot/equabot/bin/Debug/net6.0/equabot.pdb
+/Users/jshobrook/Projects/equabot/equabot/equabot/obj/Debug/net6.0/equabot.csproj.AssemblyReference.cache
+/Users/jshobrook/Projects/equabot/equabot/equabot/obj/Debug/net6.0/equabot.GeneratedMSBuildEditorConfig.editorconfig
+/Users/jshobrook/Projects/equabot/equabot/equabot/obj/Debug/net6.0/equabot.AssemblyInfoInputs.cache
+/Users/jshobrook/Projects/equabot/equabot/equabot/obj/Debug/net6.0/equabot.AssemblyInfo.cs
+/Users/jshobrook/Projects/equabot/equabot/equabot/obj/Debug/net6.0/equabot.csproj.CoreCompileInputs.cache
+/Users/jshobrook/Projects/equabot/equabot/equabot/obj/Debug/net6.0/equabot.dll
+/Users/jshobrook/Projects/equabot/equabot/equabot/obj/Debug/net6.0/ref/equabot.dll
+/Users/jshobrook/Projects/equabot/equabot/equabot/obj/Debug/net6.0/equabot.pdb
