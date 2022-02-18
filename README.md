@@ -1,3 +1,3 @@
 # Equaliser
 
-Automated unit testing for IEquatable objects. 
+Equaliser automates unit testing for `IEquatable` objects. 
