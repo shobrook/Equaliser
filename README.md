@@ -1,2 +1,3 @@
-# autoqual
-Automated unit testing for IEquatable objects
+# Equaliser
+
+Automated unit testing for IEquatable objects. 
