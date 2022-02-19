@@ -5,7 +5,7 @@ using Equaliser.Exceptions;
 
 namespace Equaliser.Tests
 {
-    public class ObjectEqualityTests<TObj> : IObjectEqualityTests<TObj>
+    public class ObjectEqualityTests<TObj> : IObjectEqualityTests
     {
         private Fixture _fixture = new Fixture();
  
@@ -15,7 +15,7 @@ namespace Equaliser.Tests
             try
             {
                 AssertEquality();
-                AssertInequalityForAllProperties();
+                AssertInequalityByProperty();
             }
             catch (EqualityException<TObj> ee)
             {
@@ -27,9 +27,7 @@ namespace Equaliser.Tests
             }
 
             if (exceptions.Any())
-            {
                 throw new AggregateException(exceptions);
-            }
         }
 
         public void AssertEquality()
@@ -38,25 +36,16 @@ namespace Equaliser.Tests
             var clonedMockObject = mockObject.DeepClone();
 
             if (!mockObject.Equals(clonedMockObject))
-            {
                 throw new EqualityException<TObj>();
-            }
-            
-            // Check if T inherits from IAutoEquatable
-            // If it does, then retrieve the list of ignored properties (i.e. properties with the [EquatableIgnore] attribute)
-            // Exclude these properties from the fixture by chaining .Without(p => p.PropertyName);
         }
 
         public void AssertInequalityForAllProperties()
         {
             var mockObject = _fixture.Create<TObj>();
-            var clonedMockObject = _fixture.Create<TObj>();
-            // QUESTION: How to ensure these objects won't have identical values?
+            var otherMockObject = _fixture.Create<TObj>();
 
-            if (mockObject.Equals(clonedMockObject))
-            {
+            if (mockObject.Equals(otherMockObject))
                 throw new InequalityException<TObj>(null);
-            }
         }
 
         public void AssertInequalityByProperty()
@@ -67,15 +56,11 @@ namespace Equaliser.Tests
             {
                 var changedMockObject = CloneAndChangePropertyValue(property, mockObject);
                 if (mockObject.Equals(changedMockObject))
-                {
                     exceptions.Add(new InequalityException<TObj>(property.Name));
-                }
             }
 
             if (exceptions.Any())
-            {
                 throw new AggregateException(exceptions);
-            }
         }
         
         private TObj CloneAndChangePropertyValue(PropertyInfo property, TObj mockObject)
@@ -91,7 +76,6 @@ namespace Equaliser.Tests
 
         private TProp GenerateNewPropertyValue<TProp>(TProp initialPropertyValue)
         {
-            // QUESTION: How can you ensure this isn't identical to the original property value?
             return _fixture.Create<TProp>();
         }
     }

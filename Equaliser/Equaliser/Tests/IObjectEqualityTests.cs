@@ -1,9 +1,10 @@
-namespace Equaliser.Tests;
-
-public interface IObjectEqualityTests<T>
+namespace Equaliser.Tests
 {
-    void AssertEquality() {}
-    void AssertInequalityForAllProperties() {}
-    void AssertInequalityByProperty() {}
-    void AssertAll() {}
+    public interface IObjectEqualityTests
+    {
+        void AssertEquality() {}
+        void AssertInequalityForAllProperties() {}
+        void AssertInequalityByProperty() {}
+        void AssertAll() {}
+    }
 }
