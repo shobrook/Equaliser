@@ -31,13 +31,16 @@ public class ObjectUnderTest : IEquatable<ObjectUnderTest>
 
   public bool Equals(MyObject other)
   {
-    return Prop1 == other.Prop1 && Prop2 == other.Prop2
+    return Prop1 == other.Prop1
+           && Prop2 != other.Prop2
            && ReferenceEquals(Prop3, other.Prop3);
   }
 }
 ```
 
-Notice the attributes on `Prop3` and `Prop4`. Equaliser allows you to specify which properties are *ignored* in the equality method or compared by *reference* (instead of by *value*), using the `Ignore` and `CompareByReference` attributes, respectively.
+This class has _incorrectly_ implemented its equality method by returning `Prop2 != other.Prop2` instead of `==`.
+
+>Notice the attributes on `Prop3` and `Prop4`. Equaliser allows you to specify which properties are *ignored* in the equality method or compared by *reference* (instead of by *value*), using the `Ignore` and `CompareByReference` attributes, respectively.
 
 ### Testing Equality
 
@@ -45,16 +48,17 @@ Notice the attributes on `Prop3` and `Prop4`. Equaliser allows you to specify wh
 var equalityTests = EqualityTests<ObjectUnderTest>();
 ```
 
-**Before**
+**Without Equaliser**
 
 ```csharp
 var A = new ObjectUnderTest { Prop1 = 0, Prop2 = "abc", Prop3 = childA };
 var B = new ObjectUnderTest { Prop1 = 0, Prop2 = "abc", Prop3 = childA };
 
 Assert.IsTrue(A.Equals(B));
+Assert.IsTrue(B.Equals(A));
 ```
 
-**After**
+**With Equaliser**
 
 ```csharp
 equalityTests.AssertEquality();
@@ -62,9 +66,7 @@ equalityTests.AssertEquality();
 
 ### Testing Inequality
 
-#### Property-by-Property
-
-**Before**
+**Without Equaliser**
 
 ```csharp
 var childA = new MyChildObject(0);
@@ -78,34 +80,17 @@ var D = new ObjectUnderTest { Prop1 = 0, Prop2 = "abc", Prop3 = childB };
 Assert.IsFalse(A.Equals(B)); // Prop1 is different
 Assert.IsFalse(A.Equals(C)); // Prop2 is different
 Assert.IsFalse(A.Equals(D)); // Prop3 is different
+
+// Ensure bi-directional equality
+Assert.IsFalse(B.Equals(A));
+Assert.IsFalse(C.Equals(A));
+Assert.IsFalse(D.Equals(A));
 ```
 
-**After**
+**With Equaliser**
 
 ```csharp
 outEqualityTests.AssertInequalityByProperty();
 ```
-
-#### All Properties
-
-**Before**
-
-```csharp
-var childA = new MyChildObject(0);
-var childB = new MyChildObject(1);
-
-var A = new ObjectUnderTest { Prop1 = 0, Prop2 = "abc", Prop3 = childA };
-var B = new ObjectUnderTest { Prop1 = 1, Prop2 = "def", Prop3 = childB };
-
-Assert.IsFalse(A.Equals(B));
-```
-
-**After**
-
-```csharp
-outEqualityTests.AssertInequalityByProperty();
-```
-
-Why use AssertInequalityByProperty instead of AssertInequalityForAllProperties? The former uses reflection and tests more cases (one per property), thus making it slower. It is more robust though.
 
 Note that Equaliser may not be useful for objects with custom logic in their Equals methods, besides comparisons between properties.
