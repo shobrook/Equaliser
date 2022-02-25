@@ -2,8 +2,7 @@ namespace Equaliser.Tests;
 
 public interface IEqualityTests
 {
-    void AssertEquality() {}
+    void AssertAll() {}
     void AssertInequalityForAllProperties() {}
     void AssertInequalityByProperty() {}
-    void AssertAll() {}
 }

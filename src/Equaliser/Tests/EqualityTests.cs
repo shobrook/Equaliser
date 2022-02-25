@@ -15,7 +15,7 @@ public class EqualityTests<TObj> : IEqualityTests
         _fixture = new Fixture();
     }
 
-    public void AssertEqualityAndInequality()
+    public void AssertAll()
     {
         var exceptions = new List<Exception>();
         try
@@ -43,15 +43,6 @@ public class EqualityTests<TObj> : IEqualityTests
 
         if (!mockObject.Equals(clonedMockObject))
             throw new EqualityException<TObj>();
-    }
-
-    public void AssertInequalityForAllProperties()
-    {
-        var mockObject = _fixture.Create<TObj>();
-        var otherMockObject = _fixture.Create<TObj>();
-
-        if (mockObject.Equals(otherMockObject))
-            throw new InequalityException<TObj>(null);
     }
 
     public void AssertInequalityByProperty()
