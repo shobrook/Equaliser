@@ -4,7 +4,7 @@ Equaliser automates unit testing for `IEquatable` objects –– i.e. any object
 
 ```csharp
 var equalityTests = EqualityTests<ObjectUnderTest>();
-equalityTests.AssertEqualityAndInequality();
+equalityTests.AssertAll();
 ```
 
 ## Installation
@@ -13,7 +13,7 @@ TODO: Publish to nuget.org
 
 ## Usage
 
-We'll introduce the features of Equaliser by testing the following class:
+We'll introduce the features of Equaliser by using the following class as an example:
 
 ```csharp
 using Equaliser.Attributes;
@@ -38,15 +38,17 @@ public class ObjectUnderTest : IEquatable<ObjectUnderTest>
 }
 ```
 
-This class has _incorrectly_ implemented its equality method by returning `Prop2 != other.Prop2` instead of `==`.
+This class has _incorrectly_ implemented its equality method by returning `Prop2 != other.Prop2` instead of `Prop2 == other.Prop2`. We'll show how Equaliser will automatically catch this mistake.
 
 >Notice the attributes on `Prop3` and `Prop4`. Equaliser allows you to specify which properties are *ignored* in the equality method or compared by *reference* (instead of by *value*), using the `Ignore` and `CompareByReference` attributes, respectively.
 
-### Testing Equality
+To begin testing with Equaliser, we need to instantiate an `EqualityTests` object:
 
 ```csharp
-var equalityTests = EqualityTests<ObjectUnderTest>();
+var equalityTests = new EqualityTests<ObjectUnderTest>();
 ```
+
+### Testing Equality
 
 **Without Equaliser**
 
@@ -93,4 +95,8 @@ Assert.IsFalse(D.Equals(A));
 outEqualityTests.AssertInequalityByProperty();
 ```
 
-Note that Equaliser may not be useful for objects with custom logic in their Equals methods, besides comparisons between properties.
+### Testing multiple objects
+
+```csharp
+var namespaceEqualityTests = new NamespaceEqualityTests("my.namespace")
+```
