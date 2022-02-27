@@ -39,8 +39,8 @@ public class EqualityTests<TObj> : IEqualityTests
     public void AssertEquality()
     {
         var mockObject = _fixture.Create<TObj>();
-        var clonedMockObject = mockObject.DeepClone(); // ShallowClone()?
-
+        var clonedMockObject = CloneMockObject(mockObject);
+        
         if (!mockObject.Equals(clonedMockObject))
             throw new EqualityException<TObj>();
     }
@@ -49,8 +49,7 @@ public class EqualityTests<TObj> : IEqualityTests
     {
         var exceptions = new List<InequalityException<TObj>>();
         var mockObject = _fixture.Create<TObj>();
-        var objectProperties =
-            mockObject.GetType().GetProperties().Where(p => Attribute.IsDefined(p, typeof(Ignore)));
+        var objectProperties = GetObjectProperties(mockObject);
         foreach (var property in objectProperties)
         {
             var changedMockObject = CloneThenChangePropertyValue(property, mockObject);
@@ -62,12 +61,32 @@ public class EqualityTests<TObj> : IEqualityTests
             throw new AggregateException(exceptions);
     }
 
+    private TObj CloneMockObject(TObj mockObject)
+    {
+        var clonedMockObject = mockObject.ShallowClone(); // DeepClone()?
+        var deepProperties = GetObjectProperties(mockObject)
+            .Where(p => !Attribute.IsDefined(p, typeof(CompareByReference)));
+
+        foreach (var property in deepProperties)
+        {
+            var propertyValue = property.GetValue(clonedMockObject, null);
+            property.SetValue(clonedMockObject, propertyValue.DeepClone());
+        }
+
+        return clonedMockObject;
+    }
+
+    private IEnumerable<PropertyInfo> GetObjectProperties(TObj objectInstance)
+    {
+        return objectInstance.GetType().GetProperties().Where(p => !Attribute.IsDefined(p, typeof(Ignore)));
+    }
+
     private TObj CloneThenChangePropertyValue(PropertyInfo property, TObj mockObject)
     {
         var initialPropertyValue = property.GetValue(mockObject, null);
         var newPropertyValue = GenerateNewPropertyValue(initialPropertyValue);
 
-        var changedMockObject = mockObject.DeepClone();
+        var changedMockObject = CloneMockObject(mockObject);
         property.SetValue(changedMockObject, newPropertyValue);
 
         return changedMockObject;
