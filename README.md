@@ -7,7 +7,7 @@ var equalityTests = EqualityTests<ObjectUnderTest>();
 equalityTests.AssertAll();
 ```
 
-<!--Equaliser also tests the GetHashCode method.-->
+Equaliser also tests the `GetHashCode` method.
 
 ## Installation
 
@@ -15,7 +15,7 @@ TODO: Publish on nuget.org
 
 ## Usage
 
-We'll introduce the features of Equaliser by using the following class as an example:
+We'll introduce the features of Equaliser by example. Consider the following class:
 
 ```csharp
 using Equaliser.Attributes;
@@ -40,7 +40,7 @@ public class ObjectUnderTest : IEquatable<ObjectUnderTest>
 }
 ```
 
-This class has _incorrectly_ implemented its equality method by returning `Prop2 != other.Prop2` instead of `Prop2 == other.Prop2`. We'll show how Equaliser automatically catches this mistake.
+This class has _incorrectly_ implemented its equality method by returning `Prop2 != other.Prop2` instead of `Prop2 == other.Prop2`. We'll show how Equaliser catches this mistake.
 
 > Notice the attributes on `Prop3` and `Prop4`. Equaliser allows you to specify which properties are *ignored* in the equality method or compared by *reference* (instead of by *value*), using the `Ignore` and `CompareByReference` attributes, respectively. This information gets factored into the tests.
 
@@ -56,11 +56,13 @@ This object exposes all the methods we need to test the _equality_ case and the 
 
 ### Testing Equality
 
-Testing equality involves instantiating two identical versions of the object under test (OUT) and asserting that they're equal. Doing this manually requires creating mock objects and writing assert statements, but with Equaliser it only requires a single method call.
+Testing equality involves instantiating two identical versions of the object under test (OUT) and asserting that the equality method identifies them as equal. Doing this manually requires creating mock objects and writing assert statements, but with Equaliser it only requires a single method call.
 
-**Without Equaliser**
+**Manually:**
 
 ```csharp
+var childA = new MyChildObject(0);
+
 var A = new ObjectUnderTest { Prop1 = 0, Prop2 = "abc", Prop3 = childA };
 var B = new ObjectUnderTest { Prop1 = 0, Prop2 = "abc", Prop3 = childA };
 
@@ -68,25 +70,25 @@ Assert.IsTrue(A.Equals(B));
 Assert.IsTrue(B.Equals(A)); // Ensure bi-directional equality
 ```
 
-**With Equaliser**
+**With Equaliser:**
 
 ```csharp
 equalityTests.AssertEquality();
 ```
 
-In our example, `AssertEquality` will throw an `Equaliser.EqualityException` because the equality method is incorrectly implemented:
+In our example, Equaliser will throw an `Equaliser.EqualityException` because the equality method is incorrectly implemented:
 
 ```csharp
 EqualityException("Equality test failed (A == A returned false).")
 ```
 
-If it were implemented correctly, the method would return nothing. When an `EqualityException` is thrown, Equaliser can help you narrow down which property is causing the issue by running _inequality_ tests, covered in the next section.
+If it were implemented correctly, `AssertEquality` would return nothing.
 
 ### Testing Inequality
 
-Testing inequality involves instantiating two identical versions of the OUT, changing a single property value in one object, and then asserting the two objects aren't equal. Equaliser will repeat this process for every property to ensure robustness.
+Testing inequality involves instantiating two identical versions of the OUT, changing a single property value in one object, and then asserting the two objects aren't equal. To ensure robustness, this process is repeated for every property. Doing all this manually requires writing a lot of repetitive code (the more properties the more LOC), but with Equaliser it only requires one line of code.
 
-**Without Equaliser**
+**Manually:**
 
 ```csharp
 var childA = new MyChildObject(0);
@@ -107,13 +109,13 @@ Assert.IsFalse(C.Equals(A));
 Assert.IsFalse(D.Equals(A));
 ```
 
-**With Equaliser**
+**With Equaliser:**
 
 ```csharp
 equalityTests.AssertInequality();
 ```
 
-In our example, `AssertInequality` will throw an `Equaliser.InequalityException` for every altered property that doesn't produce inequality (in our case, only `Prop2`):
+In our example, Equaliser will throw an `Equaliser.InequalityException` for every property alteration that doesn't result in inequality (in our case, only `Prop2`):
 
 ```csharp
 AggregateException(
@@ -131,7 +133,7 @@ equalityTests.AssertAll();
 
 ### Namespace-Level Testing
 
-The `EqualityTests` object is built for testing a single object. Equaliser provides the `NamespaceEqualityTests` object for testing all the objects that inherit from `IEquatable` within a given namespace.
+The `EqualityTests` object is built for testing a single object. But Equaliser also provides the `NamespaceEqualityTests` object, which lets you test all the objects that inherit from `IEquatable` within a given namespace.
 
 ```csharp
 using Equaliser.Tests;
@@ -139,6 +141,8 @@ using Equaliser.Tests;
 var namespaceEqualityTests = new NamespaceEqualityTests("my.namespace");
 namespaceEqualityTests.AssertAll();
 ```
+
+If any object in the namespace fails the tests, the failures will be included in an `AggregateException` thrown by this method:
 
 ```csharp
 AggregateException(
