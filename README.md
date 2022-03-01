@@ -42,7 +42,7 @@ public class ObjectUnderTest : IEquatable<ObjectUnderTest>
 
 This class has _incorrectly_ implemented its equality method by returning `Prop2 != other.Prop2` instead of `Prop2 == other.Prop2`. We'll show how Equaliser automatically catches this mistake.
 
-> Notice the attributes on `Prop3` and `Prop4`. Equaliser allows you to specify which properties are *ignored* in the equality method or compared by *reference* (instead of by *value*), using the `Ignore` and `CompareByReference` attributes, respectively. This information will be factored into the tests.
+> Notice the attributes on `Prop3` and `Prop4`. Equaliser allows you to specify which properties are *ignored* in the equality method or compared by *reference* (instead of by *value*), using the `Ignore` and `CompareByReference` attributes, respectively. This information gets factored into the tests.
 
 To begin testing with Equaliser, we need to instantiate an `EqualityTests` object:
 
@@ -77,7 +77,7 @@ equalityTests.AssertEquality();
 In our example, `AssertEquality` will throw an `Equaliser.EqualityException` because the equality method is incorrectly implemented:
 
 ```csharp
-EqualityException("Equality test failed (A == A returned false). Object: ObjectUnderTest.")
+EqualityException("Equality test failed (A == A returned false).")
 ```
 
 If it were implemented correctly, the method would return nothing. When an `EqualityException` is thrown, Equaliser can help you narrow down which property is causing the issue by running _inequality_ tests, covered in the next section.
@@ -117,7 +117,7 @@ In our example, `AssertInequality` will throw an `Equaliser.InequalityException`
 
 ```csharp
 AggregateException(
-  InequalityException("Inequality test failed (A == B returned true). Object: ObjectUnderTest. Property: Prop2.")
+  InequalityException("Inequality test failed (A == B returned true). Property: Prop2.")
 )
 ```
 
@@ -134,6 +134,16 @@ equalityTests.AssertAll();
 The `EqualityTests` object is built for testing a single object. Equaliser provides the `NamespaceEqualityTests` object for testing all the objects that inherit from `IEquatable` within a given namespace.
 
 ```csharp
+using Equaliser.Tests;
+
 var namespaceEqualityTests = new NamespaceEqualityTests("my.namespace");
 namespaceEqualityTests.AssertAll();
+```
+
+```csharp
+AggregateException(
+  EqualityException("Equality test failed (A == A returned false). Object: ObjectUnderTest."),
+  InequalityException("Inequality test failed (A == B returned true). Object: ObjectUnderTest. Property: Prop2."),
+  ...
+)
 ```
