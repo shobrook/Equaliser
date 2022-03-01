@@ -9,16 +9,27 @@ public class NamespaceEqualityTests : INamespaceEqualityTests
         Namespace = nspace;
     }
 
-    public void AssertForAllObjects()
+    public void AssertAll()
     {
+        var exceptions = new List<Exception>();
         var equalityTypes = GetTypesImplementingInterface(typeof(IEquatable<>));
         foreach (var type in equalityTypes)
         {
             var objectEqualityTestsType = typeof(EqualityTests<>).MakeGenericType(type);
             var objectEqualityTests = (IEqualityTests) Activator.CreateInstance(objectEqualityTestsType);
-            
-            objectEqualityTests.AssertAll();
+
+            try
+            {
+                objectEqualityTests.AssertAll();
+            }
+            catch (AggregateException ae)
+            {
+                exceptions.AddRange(ae.InnerExceptions);
+            }
         }
+
+        if (exceptions.Any())
+            throw new AggregateException(exceptions);
     }
     
     private IEnumerable<Type> GetTypesImplementingInterface(Type inter)
