@@ -44,7 +44,7 @@ This class has _incorrectly_ implemented its equality method by returning `Prop2
 
 > Notice the attributes on `Prop3` and `Prop4`. Equaliser allows you to specify which properties are *ignored* in the equality method or compared by *reference* (instead of by *value*), using the `Ignore` and `CompareByReference` attributes, respectively. This information gets factored into the tests.
 
-To begin testing with Equaliser, we need to instantiate an `EqualityTests` object:
+To start, we need to instantiate an `EqualityTests` object:
 
 ```csharp
 using Equaliser.Tests;
@@ -133,7 +133,7 @@ equalityTests.AssertAll();
 
 ### Namespace-Level Testing
 
-The `EqualityTests` object is built for testing a single object. But Equaliser also provides the `NamespaceEqualityTests` object, which lets you test all the objects that inherit from `IEquatable` within a given namespace.
+The `EqualityTests` object lets you test a single object. But Equaliser also provides the `NamespaceEqualityTests` object, which lets you test all the objects inherited from `IEquatable` within a given namespace.
 
 ```csharp
 using Equaliser.Tests;
@@ -151,3 +151,5 @@ AggregateException(
   ...
 )
 ```
+
+`NamespaceEqualityTests` also exposes the `AssertEquality` and `AssertInequality` methods.
