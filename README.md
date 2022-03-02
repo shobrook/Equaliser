@@ -86,7 +86,7 @@ If it were implemented correctly, `AssertEquality` would return nothing.
 
 ### Testing Inequality
 
-Testing inequality involves instantiating two identical versions of the OUT, changing a single property value in one object, and then asserting the two objects aren't equal. To ensure robustness, this process is repeated for every property. Doing all this manually requires writing a lot of repetitive code (the more properties the more LOC), but with Equaliser it only requires one line of code.
+Testing inequality involves instantiating two identical versions of the OUT, changing a single property value in one object, and then asserting the two objects aren't equal. To ensure robustness, this process is repeated for every property. Doing all this manually requires writing a lot of repetitive code (the more properties, the more LOC), but with Equaliser it only requires one line of code.
 
 **Manually:**
 
