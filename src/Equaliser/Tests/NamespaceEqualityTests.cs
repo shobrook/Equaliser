@@ -11,6 +11,21 @@ public class NamespaceEqualityTests : INamespaceEqualityTests
 
     public void AssertAll()
     {
+        AssertEqualityTestForAllObjects(tests => tests.AssertAll());
+    }
+    
+    public void AssertEquality()
+    {
+        AssertEqualityTestForAllObjects(tests => tests.AssertEquality());
+    }
+    
+    public void AssertInequality()
+    {
+        AssertEqualityTestForAllObjects(tests => tests.AssertInequality());
+    }
+
+    private void AssertEqualityTestForAllObjects(Action<IEqualityTests> invokedTestMethod)
+    {
         var exceptions = new List<Exception>();
         var equalityTypes = GetTypesImplementingInterface(typeof(IEquatable<>));
         foreach (var type in equalityTypes)
@@ -20,18 +35,22 @@ public class NamespaceEqualityTests : INamespaceEqualityTests
 
             try
             {
-                objectEqualityTests.AssertAll();
+                invokedTestMethod(objectEqualityTests);
             }
             catch (AggregateException ae)
             {
                 exceptions.AddRange(ae.InnerExceptions);
+            }
+            catch (Exception e)
+            {
+                exceptions.Add(e);
             }
         }
 
         if (exceptions.Any())
             throw new AggregateException(exceptions);
     }
-    
+
     private IEnumerable<Type> GetTypesImplementingInterface(Type inter)
     {
         return AppDomain

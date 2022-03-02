@@ -21,7 +21,7 @@ public class EqualityTests<TObj> : IEqualityTests
         try
         {
             AssertEquality();
-            AssertInequalityByProperty();
+            AssertInequality();
         }
         catch (EqualityException<TObj> ee)
         {
@@ -40,12 +40,15 @@ public class EqualityTests<TObj> : IEqualityTests
     {
         var mockObject = _fixture.Create<TObj>();
         var clonedMockObject = CloneMockObject(mockObject);
-        
-        if (!mockObject.Equals(clonedMockObject))
-            throw new EqualityException<TObj>();
+
+        var isEqualityInvalid = !mockObject.Equals(clonedMockObject) || !clonedMockObject.Equals(mockObject);
+        var isHashCodeInvalid = mockObject.GetHashCode() != clonedMockObject.GetHashCode();
+
+        if (isEqualityInvalid || isHashCodeInvalid)
+            throw new EqualityException<TObj>(isEqualityInvalid, isHashCodeInvalid);
     }
 
-    public void AssertInequalityByProperty()
+    public void AssertInequality()
     {
         var exceptions = new List<InequalityException<TObj>>();
         var mockObject = _fixture.Create<TObj>();
@@ -53,8 +56,12 @@ public class EqualityTests<TObj> : IEqualityTests
         foreach (var property in objectProperties)
         {
             var changedMockObject = CloneThenChangePropertyValue(property, mockObject);
-            if (mockObject.Equals(changedMockObject))
-                exceptions.Add(new InequalityException<TObj>(property.Name));
+
+            var isEqualityInvalid = mockObject.Equals(changedMockObject) || changedMockObject.Equals(mockObject);
+            var isHashCodeInvalid = mockObject.GetHashCode() == changedMockObject.GetHashCode();
+            
+            if (isEqualityInvalid || isHashCodeInvalid)
+                exceptions.Add(new InequalityException<TObj>(isEqualityInvalid, isHashCodeInvalid, property.Name));
         }
 
         if (exceptions.Any())
