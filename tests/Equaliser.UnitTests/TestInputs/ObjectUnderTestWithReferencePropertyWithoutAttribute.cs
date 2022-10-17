@@ -1,16 +1,14 @@
 using System;
-using Equaliser.Attributes;
 
 namespace Equaliser.UnitTests.TestInputs;
 
-public class ObjectUnderTestWithReferenceProperties : IEquatable<ObjectUnderTestWithReferenceProperties>
+public class ObjectUnderTestWithReferencePropertyWithoutAttribute : IEquatable<ObjectUnderTestWithReferencePropertyWithoutAttribute>
 {
     public int Property1 { get; set; }
     public string Property2 { get; set; }
-    [CompareByReference]
     public ChildObject Property3 { get; set; }
     
-    public bool Equals(ObjectUnderTestWithReferenceProperties other)
+    public bool Equals(ObjectUnderTestWithReferencePropertyWithoutAttribute other)
     {
         return Property1.Equals(other.Property1)
                && Property2.Equals(other.Property2)

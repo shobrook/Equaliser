@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using AutoFixture;
+using AutoFixture.Kernel;
 using Force.DeepCloner;
 using Equaliser.Attributes;
 using Equaliser.Exceptions;
@@ -9,10 +10,14 @@ namespace Equaliser.Tests;
 public class EqualityTests<TObj> : IEqualityTests
 {
     private Fixture _fixture;
+    private bool _isEqualsImplemented;
+    private bool _isGetHashCodeImplemented;
 
     public EqualityTests()
     {
         _fixture = new Fixture();
+        _isEqualsImplemented = HasMethod("Equals");
+        _isGetHashCodeImplemented = HasMethod("GetHashCode");
     }
 
     public void AssertAll()
@@ -20,12 +25,16 @@ public class EqualityTests<TObj> : IEqualityTests
         var exceptions = new List<Exception>();
         try
         {
-            AssertEquality();
-            AssertInequality();
+            AssertEquality(); 
         }
         catch (EqualityException<TObj> ee)
         {
             exceptions.Add(ee);
+        }
+        
+        try
+        {
+            AssertInequality();
         }
         catch (AggregateException ae)
         {
@@ -41,9 +50,13 @@ public class EqualityTests<TObj> : IEqualityTests
         var mockObject = _fixture.Create<TObj>();
         var clonedMockObject = CloneMockObject(mockObject);
 
-        var isEqualityInvalid = !mockObject.Equals(clonedMockObject) || !clonedMockObject.Equals(mockObject);
-        var isHashCodeInvalid = mockObject.GetHashCode() != clonedMockObject.GetHashCode();
-
+        var isEqualityInvalid = _isEqualsImplemented
+            ? !mockObject.Equals(clonedMockObject) || !clonedMockObject.Equals(mockObject)
+            : false;
+        var isHashCodeInvalid = _isGetHashCodeImplemented
+            ? mockObject.GetHashCode() != clonedMockObject.GetHashCode()
+            : false;
+        
         if (isEqualityInvalid || isHashCodeInvalid)
             throw new EqualityException<TObj>(isEqualityInvalid, isHashCodeInvalid);
     }
@@ -57,8 +70,12 @@ public class EqualityTests<TObj> : IEqualityTests
         {
             var changedMockObject = CloneThenChangePropertyValue(property, mockObject);
 
-            var isEqualityInvalid = mockObject.Equals(changedMockObject) || changedMockObject.Equals(mockObject);
-            var isHashCodeInvalid = mockObject.GetHashCode() == changedMockObject.GetHashCode();
+            var isEqualityInvalid = _isEqualsImplemented
+                ? mockObject.Equals(changedMockObject) || changedMockObject.Equals(mockObject)
+                : false;
+            var isHashCodeInvalid = _isGetHashCodeImplemented
+                ? mockObject.GetHashCode() == changedMockObject.GetHashCode()
+                : false;
             
             if (isEqualityInvalid || isHashCodeInvalid)
                 exceptions.Add(new InequalityException<TObj>(isEqualityInvalid, isHashCodeInvalid, property.Name));
@@ -83,15 +100,14 @@ public class EqualityTests<TObj> : IEqualityTests
         return clonedMockObject;
     }
 
-    private IEnumerable<PropertyInfo> GetObjectProperties(TObj objectInstance)
-    {
-        return objectInstance.GetType().GetProperties().Where(p => !Attribute.IsDefined(p, typeof(Ignore)));
-    }
+    private IEnumerable<PropertyInfo> GetObjectProperties(TObj objectInstance) =>
+        objectInstance.GetType().GetProperties().Where(p => !Attribute.IsDefined(p, typeof(Ignore)));
 
     private TObj CloneThenChangePropertyValue(PropertyInfo property, TObj mockObject)
     {
         var initialPropertyValue = property.GetValue(mockObject, null);
-        var newPropertyValue = GenerateNewPropertyValue(initialPropertyValue);
+        // var newPropertyValue = GenerateNewPropertyValue(initialPropertyValue);
+        var newPropertyValue = GenerateNewPropertyValue(property.PropertyType);
 
         var changedMockObject = CloneMockObject(mockObject);
         property.SetValue(changedMockObject, newPropertyValue);
@@ -99,8 +115,23 @@ public class EqualityTests<TObj> : IEqualityTests
         return changedMockObject;
     }
 
-    private TProp GenerateNewPropertyValue<TProp>(TProp initialPropertyValue)
+    // private TProp GenerateNewPropertyValue<TProp>(TProp initialPropertyValue) => _fixture.Create<TProp>();
+
+    private object GenerateNewPropertyValue(Type propertyType)
     {
-        return _fixture.Create<TProp>();
+        var context = new SpecimenContext(_fixture);
+        return context.Resolve(propertyType);
     }
+    
+    private static bool HasMethod(string methodName)
+    {
+        try
+        {
+            return typeof(TObj).GetMethod(methodName) != null;
+        }
+        catch (AmbiguousMatchException)
+        {
+            return true;
+        }
+    } 
 }
