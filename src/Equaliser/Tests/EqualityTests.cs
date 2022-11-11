@@ -7,7 +7,7 @@ using Equaliser.Exceptions;
 
 namespace Equaliser.Tests;
 
-public class EqualityTests<TObj> : IEqualityTests
+public class EqualityTests<TObj> : IEqualityTests where TObj : IEquatable<TObj>
 {
     private Fixture _fixture;
     private bool _isEqualsImplemented;
@@ -127,7 +127,8 @@ public class EqualityTests<TObj> : IEqualityTests
     {
         try
         {
-            return typeof(TObj).GetMethod(methodName) != null;
+            var method = typeof(TObj).GetMethod(methodName);
+            return method != null && method.DeclaringType == typeof(TObj);
         }
         catch (AmbiguousMatchException)
         {

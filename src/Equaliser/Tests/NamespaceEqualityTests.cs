@@ -64,11 +64,8 @@ public class NamespaceEqualityTests : INamespaceEqualityTests
     {
         if (inter.IsAssignableFrom(type))
             return true;
-        if (type.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == inter))
-            return true;
-
-        // type.IsClass && !type.IsAbstract
         
-        return false;
+        return type.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == inter);
+        // type.IsClass && !type.IsAbstract
     }
 }
