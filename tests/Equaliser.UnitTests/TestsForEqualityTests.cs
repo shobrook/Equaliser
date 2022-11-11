@@ -1,3 +1,4 @@
+using System;
 using Equaliser.Tests;
 using Equaliser.UnitTests.TestInputs;
 using NUnit.Framework;
@@ -21,6 +22,13 @@ public class TestsForEqualityTests
     }
     
     [Test]
+    public void IgnoredPropertyShouldFailWithoutAttribute()
+    {
+        var equalityTests = new EqualityTests<ObjectUnderTestWithIgnoredPropertyWithoutAttribute>();
+        Assert.Throws<AggregateException>(() => equalityTests.AssertAll());
+    }
+    
+    [Test]
     public void ReferenceEqualsShouldPassWithAttribute()
     {
         var equalityTests = new EqualityTests<ObjectUnderTestWithReferencePropertyWithAttribute>();
@@ -31,6 +39,6 @@ public class TestsForEqualityTests
     public void ReferenceEqualsShouldFailWithoutAttribute()
     {
         var equalityTests = new EqualityTests<ObjectUnderTestWithReferencePropertyWithoutAttribute>();
-        equalityTests.AssertAll();
+        Assert.Throws<AggregateException>(() => equalityTests.AssertAll());
     }
 }
