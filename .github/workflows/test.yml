@@ -27,4 +27,4 @@ jobs:
     - name: Unit Test
       run: |
         cd ./tests/Equaliser.UnitTests/
-        dotnet test --no-restore -e:CollectCoverage=true -e:CoverletOutput=/home/runner/work/equaliser/equaliser/ -e:CoverletOutputFormat=opencover
+        dotnet test --no-restore
