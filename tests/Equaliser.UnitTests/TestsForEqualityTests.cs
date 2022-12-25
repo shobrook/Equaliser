@@ -1,4 +1,3 @@
-using System;
 using Equaliser.Tests;
 using Equaliser.UnitTests.TestInputs;
 using NUnit.Framework;
