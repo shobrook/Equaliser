@@ -1,4 +1,3 @@
-using System;
 using Equaliser.Attributes;
 
 namespace Equaliser.UnitTests.TestInputs;
@@ -6,8 +5,10 @@ namespace Equaliser.UnitTests.TestInputs;
 public class ObjectUnderTestWithIgnoredPropertyWithAttribute : IEquatable<ObjectUnderTestWithIgnoredPropertyWithAttribute>
 {
     public int Property1 { get; set; }
+
     [Ignore]
     public string Property2 { get; set; }
+
     public ChildObject Property3 { get; set; }
     
     public bool Equals(ObjectUnderTestWithIgnoredPropertyWithAttribute other)

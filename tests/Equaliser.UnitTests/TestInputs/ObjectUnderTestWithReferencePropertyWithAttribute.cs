@@ -1,4 +1,3 @@
-using System;
 using Equaliser.Attributes;
 
 namespace Equaliser.UnitTests.TestInputs;
@@ -6,7 +5,9 @@ namespace Equaliser.UnitTests.TestInputs;
 public class ObjectUnderTestWithReferencePropertyWithAttribute : IEquatable<ObjectUnderTestWithReferencePropertyWithAttribute>
 {
     public int Property1 { get; set; }
+
     public string Property2 { get; set; }
+
     [CompareByReference]
     public ChildObject Property3 { get; set; }
     

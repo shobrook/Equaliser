@@ -1,11 +1,11 @@
-using System;
-
 namespace Equaliser.UnitTests.TestInputs;
 
 public class ObjectUnderTest : IEquatable<ObjectUnderTest>
 {
     public int Property1 { get; set; }
+
     public string Property2 { get; set; }
+
     public ChildObject Property3 { get; set; }
     
     public bool Equals(ObjectUnderTest? other)
